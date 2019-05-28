@@ -1,0 +1,64 @@
+{
+  "from": {
+    "auth": "basic",
+    "auth_key": "base64 key here",
+    "uri": "https://app.peer2beer.com.br/api/projects"
+  },
+  "to": {
+    "auth": "basic",
+    "auth_key": "base64 key here",
+    "uri": "http://api.p2b.local/jsonapi/node/project",
+    "body": {
+      "data": {
+        "type": "node--project",
+        "attributes": {
+          "title": "Cadastro API 5",
+          "abv": 2,
+          "additions": "Test adicional",
+          "appreciation": "Obrigado brow",
+          "brassagem": "2019-05-16",
+          "characteristics": "1",
+          "current_phase": "3",
+          "fermentation": "2019-05-20",
+          "finished": "2019-05-25",
+          "goal": 50,
+          "ibu": 3,
+          "kits_amount": 10,
+          "packaging": "2019-05-22",
+          "rating": 3,
+          "receive": "1",
+          "shippement": false,
+          "srm": 4,
+          "temperature": "2"
+        },
+        "relationships": {
+          "uid": {
+            "data": {
+              "type": "user--user",
+              "id": "ab99909d-bc11-4449-92c6-0b94da1a5c14"
+            }
+          },
+          "beer": {
+            "data": {
+              "type": "taxonomy_term--taxonomy_beer",
+              "id": "d16e1f79-31c7-44cc-9e50-d8ebcabac9ff"
+            }
+          },
+          "cup": {
+            "data": {
+              "type": "taxonomy_term--taxonomy_cup",
+              "id": "d89d72ab-dc2e-45f4-83a2-5503d29ff4e9"
+            }
+          },
+          "hamonization": {
+            "data": {
+              "type": "taxonomy_term--taxonomy_harmonization",
+              "id": "47c63234-6e13-4135-9030-1a128ced36e3"
+            }
+          }
+        }
+
+      }
+    }
+  }
+}
