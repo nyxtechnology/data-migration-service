@@ -135,44 +135,56 @@ class DataMigration
         $data = [];
 
         foreach ($settings as $property => $value) {
-            if (substr($value,0,1) == '@') {
-                // Remove start @ .: @products.product[id=132].name to products.product[id=132].name
-                $propertyClean = ltrim($value, '@');
-
-                // Split variable in .: products.product[id=132].name to ["products","product[id=123]","name"]
-                $keys = explode('.',$propertyClean);
-                $valueFrom = $from;
-                // Foreach in the properties
-                foreach ($keys as $key) {
-                    $filters = [];
-                    // Check property has filter. From product[id=123] to ["[id=123]","id=123"]
-                    if (preg_match_all('/\[(.*?)\]/',$key, $filters)) {
-                        // Replace filter to get only property. From product[id=123] to product.
-                        $prop = preg_replace('/\\[(.*?)\\]/', '', $key);
-                        $valueFrom = $valueFrom->$prop;
-
-                        // Search element with the filter criteria. Ex.: id=123
-                        $filterValues = explode('=',$filters[1][0]);
-                        foreach ($valueFrom as $position => $element) {
-                            $checkValue = $filterValues[0];
-
-                            if ($element->$checkValue == $filterValues[1]){
-                                $valueFrom = $valueFrom[$position];
-                                break;
-                            }
-                        }
-                    }
-                    else {
-                        $valueFrom = $valueFrom->$key;
-                    }
-                }
-
-                $data[$property] = $valueFrom;
-            }
-            else
-                $data[$property] = $value;
+            $data[$property] = $this->getValueFromVariable($value, $from);
         }
 
         return (object) $data;
+    }
+
+    /**
+     * Get value from variable. Exemplo: @user.name return the name of the user object.
+     * @param $variable
+     * @param $from
+     * @return string
+     */
+    private function getValueFromVariable($variable, $from) {
+        $return = $variable;
+        if (substr($variable,0,1) == '@') {
+            // Remove start @ .: @products.product[id=132].name to products.product[id=132].name
+            $propertyClean = ltrim($variable, '@');
+
+            // Split variable in .: products.product[id=132].name to ["products","product[id=123]","name"]
+            $keys = explode('.', $propertyClean);
+            $valueFrom = $from;
+            // Foreach in the properties
+            foreach ($keys as $key) {
+                $filters = [];
+                // Check property has filter. From product[id=123] to ["[id=123]","id=123"]
+                if (preg_match_all('/\[(.*?)\]/', $key, $filters)) {
+                    // Replace filter to get only property. From product[id=123] to product.
+                    $prop = preg_replace('/\\[(.*?)\\]/', '', $key);
+                    $valueFrom = $valueFrom->$prop;
+
+                    // Search element with the filter criteria. Ex.: id=123
+                    $filterValues = explode('=', $filters[1][0]);
+                    //TODO: To remove -> is necessary replace filter (within []) and after replace all variable
+                    $filterValues[1] = $this->getValueFromVariable(str_replace("->", '.',$filterValues[1]), $from);
+                    print_r($filterValues[1]);
+                    foreach ($valueFrom as $position => $element) {
+                        $checkValue = $filterValues[0];
+
+                        if ($element->$checkValue == $filterValues[1]) {
+                            $valueFrom = $valueFrom[$position];
+                            break;
+                        }
+                    }
+                } else {
+                    $valueFrom = $valueFrom->$key;
+                }
+            }
+
+            $return = $valueFrom;
+        }
+        return $return;
     }
 }

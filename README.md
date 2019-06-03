@@ -1,5 +1,9 @@
 # Data Migration Service
 
+This service allows you to migrate or copy data from one service to another.
+
+You can also use it to migrate values between fields of the same service
+
 ## How to Use
 
 Rename config.example.json to config.json
@@ -20,7 +24,8 @@ Data From
     },
     "user":{
         "name":"user",
-        "last_name":"last"
+        "last_name":"last",
+        "product_id":"123"
         }
     }
 }
@@ -47,7 +52,9 @@ Data settings to create your data migration
     "user_name":"@user.name",
     "last_username":"@user.last_name",
     "time":"now",
-    "buy":"@data_sources.products[id=123].name"
+    "buy":"@data_sources.products[id=@user->product_id].name"
 }
 
 ```
+
+Note: within [] use `->` instead of `.`

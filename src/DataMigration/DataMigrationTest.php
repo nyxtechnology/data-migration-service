@@ -113,7 +113,8 @@ class DataMigrationTest extends \PHPUnit\Framework\TestCase
                 },
                 "user":{
                     "name":"user",
-                    "last_name":"last"
+                    "last_name":"last",
+                    "product_id":"123"
                     }
                 }}'),
 
@@ -128,9 +129,11 @@ class DataMigrationTest extends \PHPUnit\Framework\TestCase
                     "user_name":"@user.name",
                     "last_username":"@user.last_name",
                     "time":"now",
-                    "buy":"@data_sources.products[id=123].name"
+                    "buy":"@data_sources.products[id=@user->product_id].name"
                 }'),
             ],
         ];
     }
 }
+
+// TODO: Need create test to config.json
