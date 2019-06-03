@@ -55,7 +55,8 @@ class DataMigrationTest extends \PHPUnit\Framework\TestCase
     public function testFromTo($startObject, $toObject, $migrationSettings) {
 
         $dataMigration = new DataMigration();
-        $result = $dataMigration->fromTo($startObject, $migrationSettings);
+
+        $result = $dataMigration->fromTo($startObject->from, $migrationSettings);
 
         $this->assertEquals($result, $toObject);
 
@@ -65,10 +66,10 @@ class DataMigrationTest extends \PHPUnit\Framework\TestCase
 
         return [
             [
-                json_decode('{
+                json_decode('{"from":{
                 "name":"user",
                 "last_name":"last"
-                }'),
+                }}'),
 
                 json_decode('{
                 "user_name":"user",
@@ -83,12 +84,12 @@ class DataMigrationTest extends \PHPUnit\Framework\TestCase
                 }'),
             ],
             [
-                json_decode('{
+                json_decode('{"from":{
                 "user":{
                     "name":"user",
                     "last_name":"last"
                     }
-                }'),
+                }}'),
 
                 json_decode('{
                 "user_name":"user",
@@ -100,6 +101,34 @@ class DataMigrationTest extends \PHPUnit\Framework\TestCase
                     "user_name":"@user.name",
                     "last_username":"@user.last_name",
                     "time":"now"
+                }'),
+            ],
+            [
+                json_decode('{"from":{
+                "data_sources": {
+                    "products": [
+                            {"name":"Product 1", "id":"123"},
+                            {"name":"Product 2", "id":"1234"}
+                        ]
+                },
+                "user":{
+                    "name":"user",
+                    "last_name":"last"
+                    }
+                }}'),
+
+                json_decode('{
+                "user_name":"user",
+                "last_username":"last",
+                "time":"now",
+                "buy":"Product 1"
+                }'),
+
+                json_decode('{
+                    "user_name":"@user.name",
+                    "last_username":"@user.last_name",
+                    "time":"now",
+                    "buy":"@data_sources.products[id=123].name"
                 }'),
             ],
         ];

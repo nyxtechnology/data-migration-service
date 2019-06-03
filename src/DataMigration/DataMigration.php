@@ -136,12 +136,35 @@ class DataMigration
 
         foreach ($settings as $property => $value) {
             if (substr($value,0,1) == '@') {
+                // Remove start @ .: @products.product[id=132].name to products.product[id=132].name
                 $propertyClean = ltrim($value, '@');
 
+                // Split variable in .: products.product[id=132].name to ["products","product[id=123]","name"]
                 $keys = explode('.',$propertyClean);
                 $valueFrom = $from;
+                // Foreach in the properties
                 foreach ($keys as $key) {
-                    $valueFrom = $valueFrom->$key;
+                    $filters = [];
+                    // Check property has filter. From product[id=123] to ["[id=123]","id=123"]
+                    if (preg_match_all('/\[(.*?)\]/',$key, $filters)) {
+                        // Replace filter to get only property. From product[id=123] to product.
+                        $prop = preg_replace('/\\[(.*?)\\]/', '', $key);
+                        $valueFrom = $valueFrom->$prop;
+
+                        // Search element with the filter criteria. Ex.: id=123
+                        $filterValues = explode('=',$filters[1][0]);
+                        foreach ($valueFrom as $position => $element) {
+                            $checkValue = $filterValues[0];
+
+                            if ($element->$checkValue == $filterValues[1]){
+                                $valueFrom = $valueFrom[$position];
+                                break;
+                            }
+                        }
+                    }
+                    else {
+                        $valueFrom = $valueFrom->$key;
+                    }
                 }
 
                 $data[$property] = $valueFrom;
